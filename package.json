@@ -1,0 +1,15 @@
+{
+  "name": "agriculture-insurance-assessment",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:client": "cd client && npm install && npm run build",
+    "build:server": "cd server && npm install",
+    "build": "npm run build:client && npm run build:server",
+    "start": "cd server && node -e \"require('ts-node').register({transpileOnly:true}); require('./src/app.ts')\"",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
