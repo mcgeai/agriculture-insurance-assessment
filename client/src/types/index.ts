@@ -61,17 +61,17 @@ export interface SubmitResult {
 }
 
 export const DIMENSION_LABELS: Record<string, string> = {
-  D1: '农业保险专业知识',
-  D2: '系统操作能力',
-  D3: '问题解决与沟通协调',
-  D4: '合规与风险意识',
+  D1: '保险业务和监管知识',
+  D2: '技术专业能力',
+  D3: '信息安全及风险意识',
+  D4: '前沿技术应用和落地',
 };
 
 export const DIMENSION_ICONS: Record<string, string> = {
-  D1: '📖',
+  D1: '📋',
   D2: '💻',
-  D3: '🤝',
-  D4: '🛡️',
+  D3: '🔒',
+  D4: '🚀',
 };
 
 export const RATING_COLORS: Record<string, string> = {

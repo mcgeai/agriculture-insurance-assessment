@@ -1,7 +1,7 @@
 import { getDb } from '../models/database';
 
 const DIMENSIONS = ['D1', 'D2', 'D3', 'D4'] as const;
-const QUESTIONS_PER_DIMENSION = 5;
+const QUESTIONS_PER_DIMENSION: Record<string, number> = { D1: 4, D2: 8, D3: 4, D4: 4 };
 
 interface QuestionRow {
   id: number;
@@ -27,7 +27,7 @@ export function startAssessment(userId: number): { assessment_id: number; questi
   for (const dim of DIMENSIONS) {
     const rows = db.prepare(
       'SELECT id, dimension, content, option_a, option_b, option_c, option_d, correct_answer FROM questions WHERE dimension = ? AND is_active = 1 ORDER BY RANDOM() LIMIT ?'
-    ).all(dim, QUESTIONS_PER_DIMENSION) as QuestionRow[];
+    ).all(dim, QUESTIONS_PER_DIMENSION[dim]) as QuestionRow[];
 
     for (const q of rows) {
       questions.push({
@@ -106,7 +106,8 @@ export function submitAssessment(userId: number, assessmentId: number, answers: 
       }
     }
 
-    const totalScore = calculateScore(totalCorrect, 20);
+    const totalQuestions = Object.values(dimensionTotal).reduce((a, b) => a + b, 0);
+    const totalScore = calculateScore(totalCorrect, totalQuestions || 1);
     const rating = getRating(totalScore);
 
     const dimensionScores: Record<string, { score: number; correct_count: number }> = {};
@@ -146,13 +147,13 @@ export function getAssessmentReport(userId: number, assessmentId: number): any {
   const dimScores = db.prepare('SELECT * FROM dimension_scores WHERE assessment_id = ?').all(assessmentId) as any[];
 
   const dimLabels: Record<string, string> = {
-    D1: '农业保险专业知识', D2: '系统操作能力', D3: '问题解决与沟通协调', D4: '合规与风险意识',
+    D1: '保险业务和监管知识', D2: '技术专业能力', D3: '信息安全及风险意识', D4: '前沿技术应用和落地',
   };
   const dimSuggestions: Record<string, string> = {
-    D1: '建议参加农险业务培训，学习承保理赔实务，了解政策性农险最新政策文件',
-    D2: '建议加强核心系统实操训练，熟悉数据查询与报表功能，参与故障应急演练',
-    D3: '建议参与跨部门项目协作，提升需求分析能力，加强用户服务意识培训',
-    D4: '建议学习《个人信息保护法》及公司数据安全制度，参加合规培训与案例学习',
+    D1: '建议加强保险行业通识学习，关注监管政策动态，深入理解科技伦理规范',
+    D2: '建议系统学习信息化发展、信息技术基础、信息系统治理与管理及软件工程知识，可参考软考相关教材',
+    D3: '建议学习常见网络攻击防护、密码安全管理、社会工程学防范及数据泄露场景识别',
+    D4: '建议关注AI和大模型最新应用实践，学习大数据风控建模方法，了解云原生架构技术栈',
   };
 
   const dimensionScores = dimScores.map(ds => ({
@@ -160,7 +161,7 @@ export function getAssessmentReport(userId: number, assessmentId: number): any {
     label: dimLabels[ds.dimension],
     score: ds.score,
     correct_count: ds.correct_count,
-    total_count: 5,
+    total_count: QUESTIONS_PER_DIMENSION[ds.dimension] || 5,
     rating: getRating(ds.score),
     suggestion: dimSuggestions[ds.dimension],
   }));

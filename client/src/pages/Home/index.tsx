@@ -9,10 +9,10 @@ import { DIMENSION_LABELS, DIMENSION_ICONS, AssessmentHistory } from '../../type
 const { Title, Text, Paragraph } = Typography;
 
 const dimensions = [
-  { key: 'D1', color: '#1890ff', desc: '农险条款、承保理赔流程、农业灾害知识、政策性农险体系' },
-  { key: 'D2', color: '#52c41a', desc: '核心业务系统操作、数据查询与报表、系统集成与接口、故障排查' },
-  { key: 'D3', color: '#722ed1', desc: '需求分析与转化、跨部门协作、用户服务意识、应急响应' },
-  { key: 'D4', color: '#fa8c16', desc: '数据安全与隐私保护、监管合规要求、操作风险防控、审计配合' },
+  { key: 'D1', color: '#1890ff', desc: '保险行业通识及监管政策、科技伦理等', count: 4 },
+  { key: 'D2', color: '#52c41a', desc: '信息化发展、信息技术软硬件、信息安全、信息系统治理与管理、软件工程等', count: 8 },
+  { key: 'D3', color: '#722ed1', desc: '常见网络攻击识别、密码管理、社会工程学防范、内部数据泄露场景判断等', count: 4 },
+  { key: 'D4', color: '#fa8c16', desc: 'AI和大模型应用、大数据风控建模、云原生软硬件架构等', count: 4 },
 ];
 
 const Home: React.FC = () => {
@@ -82,7 +82,7 @@ const Home: React.FC = () => {
                 <Tag color={getDimensionStatus(dim.key) === '已完成' ? 'green' : 'default'}>
                   {getDimensionStatus(dim.key)}
                 </Tag>
-                <Text type="secondary">5题</Text>
+                <Text type="secondary">{dim.count}题</Text>
               </div>
             </Card>
           </Col>
