@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Typography, Spin, Descriptions, Tag, Row, Col, Button, Divider } from 'antd';
+import { Card, Typography, Spin, Tag, Row, Col, Button, Divider, message } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { assessmentApi } from '../../services';
 import { AssessmentReport, DIMENSION_LABELS, RATING_COLORS, RATING_LABELS } from '../../types';
 
@@ -12,6 +15,8 @@ const Report: React.FC = () => {
   const navigate = useNavigate();
   const [report, setReport] = useState<AssessmentReport | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadReport();
@@ -52,8 +57,43 @@ const Report: React.FC = () => {
 
   const weakDimensions = report.dimension_scores.filter(ds => ds.score < 75);
 
+  const handleExportPdf = async () => {
+    if (!reportRef.current || !report) return;
+    setExporting(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth - 40;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 20;
+      pdf.addImage(imgData, 'JPEG', 20, position, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - 40);
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 20;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 20, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 40);
+      }
+      const date = new Date().toISOString().slice(0, 10);
+      pdf.save(`测评报告_${report.user.name}_${date}.pdf`);
+      message.success('PDF导出成功');
+    } catch (err) {
+      message.error('PDF导出失败，请重试');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '24px' }}>
+    <div ref={reportRef} style={{ maxWidth: 960, margin: '0 auto', padding: '24px' }}>
       {/* Header */}
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -149,7 +189,8 @@ const Report: React.FC = () => {
       </Card>
 
       <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <Button onClick={() => navigate('/history')}>查看历史记录</Button>
+        <Button icon={<DownloadOutlined />} loading={exporting} onClick={handleExportPdf}>导出PDF</Button>
+        <Button onClick={() => navigate('/history')} style={{ marginLeft: 12 }}>查看历史记录</Button>
         <Button type="primary" style={{ marginLeft: 12 }} onClick={() => navigate('/home')}>返回首页</Button>
       </div>
     </div>
