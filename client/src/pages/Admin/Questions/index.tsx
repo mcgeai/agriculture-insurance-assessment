@@ -76,6 +76,7 @@ const Questions: React.FC = () => {
     { title: '维度', dataIndex: 'dimension', width: 100, render: (v: string) => DIMENSION_LABELS[v] },
     { title: '题干', dataIndex: 'content', ellipsis: true },
     { title: '正确答案', dataIndex: 'correct_answer', width: 80 },
+    { title: '解析', dataIndex: 'explanation', width: 200, ellipsis: true },
     { title: '状态', dataIndex: 'is_active', width: 80, render: (v: number) => <Tag color={v ? 'green' : 'red'}>{v ? '启用' : '停用'}</Tag> },
     {
       title: '操作', width: 200, render: (_: any, r: any) => (
@@ -119,6 +120,7 @@ const Questions: React.FC = () => {
           <Form.Item name="correct_answer" label="正确答案" rules={[{ required: true }]}>
             <Select><Select.Option value="A">A</Select.Option><Select.Option value="B">B</Select.Option><Select.Option value="C">C</Select.Option><Select.Option value="D">D</Select.Option></Select>
           </Form.Item>
+          <Form.Item name="explanation" label="答案解析"><Input.TextArea rows={3} placeholder="输入答案解析，帮助答题者理解" /></Form.Item>
         </Form>
       </Modal>
     </div>

@@ -76,3 +76,16 @@ export function getEmployeeAssessments(userId: number) {
      FROM assessments a WHERE a.user_id = ? AND a.rating != '' ORDER BY a.submitted_at DESC`
   ).all(userId);
 }
+
+export function getUserList(page: number, pageSize: number) {
+  const db = getDb();
+  const total = db.prepare('SELECT COUNT(*) as count FROM users').get() as any;
+  const users = db.prepare(
+    `SELECT id, employee_no, name, department, role, status, must_change_pwd, created_at, updated_at
+     FROM users ORDER BY id LIMIT ? OFFSET ?`
+  ).all(pageSize, (page - 1) * pageSize) as any[];
+  return {
+    data: users,
+    pagination: { page, page_size: pageSize, total: total.count },
+  };
+}

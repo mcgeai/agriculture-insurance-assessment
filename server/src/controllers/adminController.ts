@@ -36,6 +36,17 @@ export function getEmployeeAssessments(req: Request, res: Response) {
   }
 }
 
+export function listUsers(req: Request, res: Response) {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = parseInt(req.query.page_size as string) || 20;
+    const result = adminService.getUserList(page, pageSize);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: err.message } });
+  }
+}
+
 export function listQuestions(req: Request, res: Response) {
   try {
     const db = getDb();
@@ -59,10 +70,10 @@ export function listQuestions(req: Request, res: Response) {
 export function createQuestion(req: Request, res: Response) {
   try {
     const db = getDb();
-    const { dimension, content, option_a, option_b, option_c, option_d, correct_answer } = req.body;
+    const { dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation } = req.body;
     const result = db.prepare(
-      'INSERT INTO questions (dimension, content, option_a, option_b, option_c, option_d, correct_answer) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    ).run(dimension, content, option_a, option_b, option_c, option_d, correct_answer);
+      'INSERT INTO questions (dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation || '');
     res.json({ data: { id: result.lastInsertRowid }, message: '题目创建成功' });
   } catch (err: any) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: err.message } });
@@ -72,10 +83,10 @@ export function createQuestion(req: Request, res: Response) {
 export function updateQuestion(req: Request, res: Response) {
   try {
     const db = getDb();
-    const { dimension, content, option_a, option_b, option_c, option_d, correct_answer } = req.body;
+    const { dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation } = req.body;
     db.prepare(
-      `UPDATE questions SET dimension=?, content=?, option_a=?, option_b=?, option_c=?, option_d=?, correct_answer=?, updated_at=datetime('now','localtime') WHERE id=?`
-    ).run(dimension, content, option_a, option_b, option_c, option_d, correct_answer, req.params.id);
+      `UPDATE questions SET dimension=?, content=?, option_a=?, option_b=?, option_c=?, option_d=?, correct_answer=?, explanation=?, updated_at=datetime('now','localtime') WHERE id=?`
+    ).run(dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation || '', req.params.id);
     res.json({ message: '题目更新成功' });
   } catch (err: any) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: err.message } });

@@ -39,6 +39,8 @@ export const adminApi = {
   deleteQuestion: (id: number) => api.delete(`/admin/questions/${id}`),
   toggleQuestionStatus: (id: number) => api.patch(`/admin/questions/${id}/status`),
   createUser: (data: any) => api.post('/admin/users', data),
+  listUsers: (params?: { page?: number; page_size?: number }) =>
+    api.get('/admin/users', { params }),
   updateUser: (id: number, data: any) => api.put(`/admin/users/${id}`, data),
   toggleUserStatus: (id: number) => api.patch(`/admin/users/${id}/status`),
   resetPassword: (id: number, new_password: string) =>

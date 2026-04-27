@@ -20,7 +20,7 @@ const Accounts: React.FC = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const res = await adminApi.getEmployees({ page, page_size: 20 });
+      const res = await adminApi.listUsers({ page, page_size: 20 });
       setUsers(res.data.data);
       setTotal(res.data.pagination.total);
     } catch {}

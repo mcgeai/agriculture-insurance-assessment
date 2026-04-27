@@ -17,6 +17,7 @@ router.delete('/questions/:id', adminCtrl.deleteQuestion);
 router.patch('/questions/:id/status', adminCtrl.toggleQuestionStatus);
 
 router.post('/users', adminCtrl.createUser);
+router.get('/users', adminCtrl.listUsers);
 router.put('/users/:id', adminCtrl.updateUser);
 router.patch('/users/:id/status', adminCtrl.toggleUserStatus);
 router.post('/users/:id/reset-password', adminCtrl.resetPassword);
