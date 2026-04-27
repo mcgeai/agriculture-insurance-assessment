@@ -167,7 +167,7 @@ export function getAssessmentReport(userId: number, assessmentId: number): any {
   }));
 
   const answers = db.prepare(
-    `SELECT a.question_id, a.selected_answer, a.is_correct, q.dimension, q.content, q.correct_answer
+    `SELECT a.question_id, a.selected_answer, a.is_correct, q.dimension, q.content, q.option_a, q.option_b, q.option_c, q.option_d, q.correct_answer, q.explanation
      FROM answers a JOIN questions q ON a.question_id = q.id WHERE a.assessment_id = ?`
   ).all(assessmentId) as any[];
 

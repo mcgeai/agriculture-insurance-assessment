@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS questions (
   option_c TEXT NOT NULL,
   option_d TEXT NOT NULL,
   correct_answer TEXT NOT NULL,
+  explanation TEXT NOT NULL DEFAULT '',
   is_active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))

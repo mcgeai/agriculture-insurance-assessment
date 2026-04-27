@@ -112,17 +112,40 @@ const Report: React.FC = () => {
 
       {/* Detail Answers */}
       <Card title="答题详情" style={{ marginTop: 20 }}>
-        {report.answers.map((a: any, idx: number) => (
-          <div key={idx} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: idx < report.answers.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text>{idx + 1}. {a.content}</Text>
-              <Tag color={a.is_correct ? 'green' : 'red'}>{a.is_correct ? '正确' : '错误'}</Tag>
+        {report.answers.map((a: any, idx: number) => {
+          const options: Record<string, string> = { A: a.option_a, B: a.option_b, C: a.option_c, D: a.option_d };
+          return (
+            <div key={idx} style={{ marginBottom: 16, paddingBottom: 16, borderBottom: idx < report.answers.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Text strong>{idx + 1}. [{DIMENSION_LABELS[a.dimension]}] {a.content}</Text>
+                <Tag color={a.is_correct ? 'green' : 'red'}>{a.is_correct ? '正确' : '错误'}</Tag>
+              </div>
+              <div style={{ marginTop: 8, paddingLeft: 20 }}>
+                {Object.entries(options).map(([key, val]) => (
+                  <div key={key} style={{
+                    color: key === a.correct_answer ? '#52c41a' : (key === a.selected_answer && !a.is_correct ? '#ff4d4f' : '#666'),
+                    fontWeight: key === a.correct_answer || key === a.selected_answer ? 600 : 400,
+                  }}>
+                    {key}. {val}
+                    {key === a.correct_answer && ' ✓'}
+                    {key === a.selected_answer && !a.is_correct && ' ✗'}
+                  </div>
+                ))}
+              </div>
+              {!a.is_correct && (
+                <div style={{ marginTop: 4 }}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>你的答案：<span style={{ color: '#ff4d4f' }}>{a.selected_answer}</span> | 正确答案：<span style={{ color: '#52c41a' }}>{a.correct_answer}</span></Text>
+                </div>
+              )}
+              {a.explanation && (
+                <div style={{ marginTop: 8, padding: '8px 12px', background: '#f6f8fa', borderRadius: 6, borderLeft: '3px solid #1890ff' }}>
+                  <Text type="secondary" style={{ fontSize: 12, fontWeight: 600 }}>解析：</Text>
+                  <Paragraph style={{ marginBottom: 0, fontSize: 13, color: '#555' }}>{a.explanation}</Paragraph>
+                </div>
+              )}
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              你的答案：{a.selected_answer} | 正确答案：{a.correct_answer}
-            </Text>
-          </div>
-        ))}
+          );
+        })}
       </Card>
 
       <div style={{ textAlign: 'center', marginTop: 24 }}>
