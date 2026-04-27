@@ -1,5 +1,5 @@
 INSERT OR IGNORE INTO users (employee_no, name, department, password_hash, role, must_change_pwd)
-VALUES ('000000', '系统管理员', 'IT部', '$2a$10$KjUXlccSzw3FzboC.Rxrxe0aq1n8MSbbNVwmXUmNtJTALfT.MkeZG', 'admin', 0);
+VALUES ('000000', '系统管理员', 'IT部', '$2a$10$bkldLHKnawiEGMgIzuXlOeVSD.1FFllxu2JXKs/TdCKlS0C36TmQW', 'admin', 0);
 
 -- D1: 保险业务和监管知识（4题，权重20%）
 INSERT INTO questions (dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation) VALUES
