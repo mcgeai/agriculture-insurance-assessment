@@ -13,6 +13,9 @@ export const config = {
   bcrypt: {
     saltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10),
   },
+  assessment: {
+    timeLimitSeconds: parseInt(process.env.ASSESSMENT_TIME_LIMIT || '5400', 10),
+  },
   rateLimit: {
     loginMax: parseInt(process.env.LOGIN_RATE_LIMIT_MAX || '10', 10),
     loginWindowMs: parseInt(process.env.LOGIN_RATE_LIMIT_WINDOW_MS || '60000', 10),

@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import * as quizService from '../services/quizService';
+import { config } from '../config';
 
 export function getQuestions(req: Request, res: Response) {
   try {
     const result = quizService.startAssessment(req.user!.sub);
-    res.json({ data: { ...result, time_limit: 3600 } });
+    res.json({ data: { ...result, time_limit: config.assessment.timeLimitSeconds } });
   } catch (err: any) {
     res.status(err.status || 500).json({ error: { code: err.code || 'INTERNAL_ERROR', message: err.message } });
   }
