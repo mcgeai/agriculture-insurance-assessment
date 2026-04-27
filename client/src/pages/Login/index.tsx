@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Form, Input, Button, Typography, message, Modal } from 'antd';
-import { LockOutlined, UserOutlined, TeamOutlined, IdcardOutlined } from '@ant-design/icons';
+import { LockOutlined, UserOutlined, TeamOutlined, IdcardOutlined, SafetyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../services';
 import { useAuthStore } from '../../stores/authStore';
@@ -13,11 +13,23 @@ const Login: React.FC = () => {
   const [registerLoading, setRegisterLoading] = useState(false);
   const [pwdModalOpen, setPwdModalOpen] = useState(false);
   const [pwdLoading, setPwdLoading] = useState(false);
+  const [captchaId, setCaptchaId] = useState('');
+  const [captchaSvg, setCaptchaSvg] = useState('');
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
+
+  const loadCaptcha = async () => {
+    try {
+      const res = await authApi.getCaptcha();
+      setCaptchaId(res.data.data.captcha_id);
+      setCaptchaSvg(res.data.data.svg);
+    } catch {}
+  };
+
+  useEffect(() => { if (isRegister) loadCaptcha(); }, [isRegister]);
 
   const onLogin = async (values: { employee_no: string; password: string }) => {
     setLoading(true);
@@ -37,15 +49,16 @@ const Login: React.FC = () => {
     }
   };
 
-  const onRegister = async (values: { employee_no: string; name: string; department: string; password: string }) => {
+  const onRegister = async (values: { employee_no: string; name: string; department: string; password: string; captcha_text: string }) => {
     setRegisterLoading(true);
     try {
-      await authApi.register(values.employee_no, values.name, values.department, values.password);
+      await authApi.register(values.employee_no, values.name, values.department, values.password, captchaId, values.captcha_text);
       message.success('注册成功，请登录');
       setIsRegister(false);
       registerForm.resetFields();
       loginForm.setFieldsValue({ employee_no: values.employee_no });
     } catch (err: any) {
+      loadCaptcha();
       message.error(err.response?.data?.error?.message || '注册失败');
     } finally {
       setRegisterLoading(false);
@@ -121,6 +134,14 @@ const Login: React.FC = () => {
                 }),
               ]}>
                 <Input.Password prefix={<LockOutlined />} placeholder="确认密码" />
+              </Form.Item>
+              <Form.Item name="captcha_text" rules={[{ required: true, message: '请输入验证码' }]}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Input prefix={<SafetyOutlined />} placeholder="验证码" />
+                  <div onClick={loadCaptcha} style={{ cursor: 'pointer', flexShrink: 0, height: 40, display: 'flex', alignItems: 'center' }} title="点击刷新">
+                    {captchaSvg ? <span dangerouslySetInnerHTML={{ __html: captchaSvg }} /> : <Button icon={<ReloadOutlined />} />}
+                  </div>
+                </div>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={registerLoading} block>

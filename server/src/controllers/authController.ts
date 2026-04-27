@@ -1,9 +1,19 @@
 import { Request, Response } from 'express';
 import * as authService from '../services/authService';
+import * as captchaService from '../services/captchaService';
+
+export function getCaptcha(_req: Request, res: Response) {
+  const { captchaId, svg } = captchaService.generateCaptcha();
+  res.json({ data: { captcha_id: captchaId, svg } });
+}
 
 export function register(req: Request, res: Response) {
   try {
-    const { employee_no, name, department, password } = req.body;
+    const { employee_no, name, department, password, captcha_id, captcha_text } = req.body;
+    if (!captcha_id || !captcha_text || !captchaService.verifyCaptcha(captcha_id, captcha_text)) {
+      res.status(400).json({ error: { code: 'CAPTCHA_ERROR', message: '验证码错误或已过期' } });
+      return;
+    }
     if (!employee_no || !name || !department || !password) {
       res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: '请填写所有必填字段' } });
       return;
