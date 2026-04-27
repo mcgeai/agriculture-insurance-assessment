@@ -1,7 +1,7 @@
 import { getDb } from '../models/database';
 
 const DIMENSIONS = ['D1', 'D2', 'D3', 'D4'] as const;
-const QUESTIONS_PER_DIMENSION: Record<string, number> = { D1: 7, D2: 12, D3: 7, D4: 7 };
+const QUESTIONS_PER_DIMENSION: Record<string, number> = { D1: 10, D2: 15, D3: 10, D4: 10 };
 
 interface QuestionRow {
   id: number;
