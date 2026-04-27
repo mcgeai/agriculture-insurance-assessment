@@ -39,7 +39,7 @@ export function login(employee_no: string, password: string): LoginResult {
     .run(user.id);
 
   const payload = { sub: user.id, employee_no: user.employee_no, role: user.role };
-  const token = jwt.sign(payload, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
+  const token = jwt.sign(payload, config.jwt.secret, { expiresIn: config.jwt.expiresIn as any });
 
   return {
     token,
