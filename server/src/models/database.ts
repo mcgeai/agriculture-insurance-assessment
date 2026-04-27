@@ -28,6 +28,7 @@ export function initDb(): void {
 
 export function seedDb(): void {
   const db = getDb();
+  db.exec('DELETE FROM dimension_scores; DELETE FROM answers; DELETE FROM questions; DELETE FROM assessments;');
   const seedSql = fs.readFileSync(path.join(__dirname, '../../database/seed.sql'), 'utf-8');
   db.exec(seedSql);
   console.log('Seed data inserted.');
