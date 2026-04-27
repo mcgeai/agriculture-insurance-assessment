@@ -4,6 +4,8 @@ import { QuizStartResponse, SubmitResult, AssessmentHistory, AssessmentReport } 
 export const authApi = {
   login: (employee_no: string, password: string) =>
     api.post('/auth/login', { employee_no, password }),
+  register: (employee_no: string, name: string, department: string, password: string) =>
+    api.post('/auth/register', { employee_no, name, department, password }),
   changePassword: (old_password: string, new_password: string) =>
     api.put('/auth/password', { old_password, new_password }),
 };

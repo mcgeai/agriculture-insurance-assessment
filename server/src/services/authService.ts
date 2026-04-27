@@ -48,6 +48,21 @@ export function login(employee_no: string, password: string): LoginResult {
   };
 }
 
+export function register(employee_no: string, name: string, department: string, password: string): { employee_no: string; name: string } {
+  const db = getDb();
+
+  const existing = db.prepare('SELECT id FROM users WHERE employee_no = ?').get(employee_no);
+  if (existing) {
+    throw Object.assign(new Error('该工号已注册'), { code: 'DUPLICATE_EMPLOYEE_NO', status: 409 });
+  }
+
+  const password_hash = bcrypt.hashSync(password, config.bcrypt.saltRounds);
+  db.prepare(`INSERT INTO users (employee_no, name, department, password_hash, role, must_change_pwd) VALUES (?, ?, ?, ?, 'employee', 0)`)
+    .run(employee_no, name, department, password_hash);
+
+  return { employee_no, name };
+}
+
 export function changePassword(userId: number, oldPassword: string, newPassword: string): void {
   const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as any;
