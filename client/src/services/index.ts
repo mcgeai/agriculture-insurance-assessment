@@ -35,6 +35,7 @@ export const adminApi = {
   listQuestions: (params?: { dimension?: string; page?: number; page_size?: number }) =>
     api.get('/admin/questions', { params }),
   createQuestion: (data: any) => api.post('/admin/questions', data),
+  importQuestions: (markdown: string) => api.post('/admin/questions/import', { markdown }),
   updateQuestion: (id: number, data: any) => api.put(`/admin/questions/${id}`, data),
   deleteQuestion: (id: number) => api.delete(`/admin/questions/${id}`),
   toggleQuestionStatus: (id: number) => api.patch(`/admin/questions/${id}/status`),

@@ -80,6 +80,118 @@ export function createQuestion(req: Request, res: Response) {
   }
 }
 
+export function importQuestions(req: Request, res: Response) {
+  try {
+    const { markdown } = req.body;
+    if (!markdown || typeof markdown !== 'string') {
+      return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: '请提供Markdown格式题目内容' } });
+    }
+
+    const db = getDb();
+    const validDimensions = ['D1', 'D2', 'D3', 'D4'];
+
+    // Split by --- separator
+    const blocks = markdown.split(/\n\s*---\s*\n/);
+    let currentDimension = '';
+    let imported = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    const insertStmt = db.prepare(
+      'INSERT INTO questions (dimension, content, option_a, option_b, option_c, option_d, correct_answer, explanation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+
+    const insertAll = db.transaction(() => {
+      for (const block of blocks) {
+        const trimmed = block.trim();
+        if (!trimmed) continue;
+
+        // Check for dimension heading: # D1 or ## D2 or # D1: 保险业务...
+        const dimMatch = trimmed.match(/^#{1,3}\s+(D[1-4])/m);
+        if (dimMatch) currentDimension = dimMatch[1];
+
+        if (!currentDimension) {
+          failed++;
+          errors.push('第' + (imported + failed + 1) + '题: 缺少维度标识(如 # D1)');
+          continue;
+        }
+
+        // Parse question content: **bold text** or first non-option/non-meta line
+        let content = '';
+        const boldMatch = trimmed.match(/\*\*(.+?)\*\*/s);
+        if (boldMatch) {
+          content = boldMatch[1].trim();
+        } else {
+          // Take the first line that isn't a heading, option, answer, or explanation
+          const lines = trimmed.split('\n');
+          for (const line of lines) {
+            const l = line.trim();
+            if (!l || /^#{1,3}\s/.test(l) || /^[A-D][.、．]\s/.test(l) || /^答案[：:]/.test(l) || /^解析[：:]/.test(l)) continue;
+            content = l;
+            break;
+          }
+        }
+
+        if (!content) {
+          failed++;
+          errors.push('第' + (imported + failed + 1) + '题: 缺少题干');
+          continue;
+        }
+
+        // Parse options: A. / A、/ A．
+        const optionA = extractOption(trimmed, 'A');
+        const optionB = extractOption(trimmed, 'B');
+        const optionC = extractOption(trimmed, 'C');
+        const optionD = extractOption(trimmed, 'D');
+
+        if (!optionA || !optionB || !optionC || !optionD) {
+          failed++;
+          errors.push('题干"' + content.substring(0, 20) + '...": 选项不完整(需A/B/C/D)');
+          continue;
+        }
+
+        // Parse answer
+        const answerMatch = trimmed.match(/答案[：:]\s*([A-D])/);
+        if (!answerMatch) {
+          failed++;
+          errors.push('题干"' + content.substring(0, 20) + '...": 缺少答案');
+          continue;
+        }
+        const correctAnswer = answerMatch[1];
+
+        // Parse explanation
+        const explanationMatch = trimmed.match(/解析[：:]\s*(.+)/s);
+        const explanation = explanationMatch ? explanationMatch[1].trim().split(/\n/)[0].trim() : '';
+
+        const dim = currentDimension;
+        if (!validDimensions.includes(dim)) {
+          failed++;
+          errors.push('题干"' + content.substring(0, 20) + '...": 无效维度 ' + dim);
+          continue;
+        }
+
+        insertStmt.run(dim, content, optionA, optionB, optionC, optionD, correctAnswer, explanation);
+        imported++;
+      }
+    });
+
+    insertAll();
+
+    res.json({
+      data: { imported, failed, errors: errors.length > 0 ? errors : undefined },
+      message: '导入完成: 成功' + imported + '题' + (failed > 0 ? '，失败' + failed + '题' : ''),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: err.message } });
+  }
+}
+
+function extractOption(text: string, letter: string): string {
+  const regex = new RegExp(letter + '[.、．]\\s*(.+)', 'm');
+  const match = text.match(regex);
+  return match ? match[1].trim() : '';
+}
+
 export function updateQuestion(req: Request, res: Response) {
   try {
     const db = getDb();

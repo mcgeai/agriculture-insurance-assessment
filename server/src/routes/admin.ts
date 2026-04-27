@@ -12,6 +12,7 @@ router.get('/employees/:id/assessments', adminCtrl.getEmployeeAssessments);
 
 router.get('/questions', adminCtrl.listQuestions);
 router.post('/questions', adminCtrl.createQuestion);
+router.post('/questions/import', adminCtrl.importQuestions);
 router.put('/questions/:id', adminCtrl.updateQuestion);
 router.delete('/questions/:id', adminCtrl.deleteQuestion);
 router.patch('/questions/:id/status', adminCtrl.toggleQuestionStatus);
