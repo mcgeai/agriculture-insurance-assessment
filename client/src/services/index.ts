@@ -28,6 +28,7 @@ export const assessmentApi = {
 
 export const adminApi = {
   getOverview: () => api.get('/admin/overview'),
+  getStatistics: () => api.get('/admin/statistics'),
   getEmployees: (params?: { page?: number; page_size?: number; department?: string; rating?: string }) =>
     api.get('/admin/employees', { params }),
   getEmployeeAssessments: (id: number) =>

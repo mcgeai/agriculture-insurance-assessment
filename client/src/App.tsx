@@ -12,6 +12,7 @@ import Overview from './pages/Admin/Overview';
 import Questions from './pages/Admin/Questions';
 import Employees from './pages/Admin/Employees';
 import Accounts from './pages/Admin/Accounts';
+import Statistics from './pages/Admin/Statistics';
 import { useAuthStore } from './stores/authStore';
 
 interface ErrorBoundaryState {
@@ -72,6 +73,7 @@ const App: React.FC = () => {
               <Route path="/admin" element={<AdminRoute><AppLayout /></AdminRoute>}>
                 <Route index element={<Navigate to="/admin/overview" replace />} />
                 <Route path="overview" element={<Overview />} />
+                <Route path="statistics" element={<Statistics />} />
                 <Route path="questions" element={<Questions />} />
                 <Route path="employees" element={<Employees />} />
                 <Route path="accounts" element={<Accounts />} />

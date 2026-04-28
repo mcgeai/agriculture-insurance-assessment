@@ -7,6 +7,7 @@ const router = Router();
 router.use(authMiddleware, adminOnly);
 
 router.get('/overview', adminCtrl.getOverview);
+router.get('/statistics', adminCtrl.getStatistics);
 router.get('/employees', adminCtrl.getEmployees);
 router.get('/employees/:id/assessments', adminCtrl.getEmployeeAssessments);
 

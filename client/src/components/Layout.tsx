@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   HomeOutlined, FormOutlined, HistoryOutlined,
   BarChartOutlined, BookOutlined, TeamOutlined, UserOutlined,
-  LogoutOutlined, SettingOutlined,
+  LogoutOutlined, SettingOutlined, LineChartOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../stores/authStore';
 
@@ -26,6 +26,7 @@ const AppLayout: React.FC = () => {
 
   const adminMenuItems = [
     { key: '/admin/overview', icon: <BarChartOutlined />, label: '数据总览' },
+    { key: '/admin/statistics', icon: <LineChartOutlined />, label: '统计分析' },
     { key: '/admin/questions', icon: <BookOutlined />, label: '题目管理' },
     { key: '/admin/employees', icon: <TeamOutlined />, label: '员工明细' },
     { key: '/admin/accounts', icon: <UserOutlined />, label: '账号管理' },

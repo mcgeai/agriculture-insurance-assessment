@@ -13,6 +13,15 @@ export function getOverview(req: Request, res: Response) {
   }
 }
 
+export function getStatistics(req: Request, res: Response) {
+  try {
+    const data = adminService.getStatistics();
+    res.json({ data });
+  } catch (err: any) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: err.message } });
+  }
+}
+
 export function getEmployees(req: Request, res: Response) {
   try {
     const page = parseInt(req.query.page as string) || 1;
